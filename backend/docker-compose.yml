@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: customermap
+      POSTGRES_USER: customermap
+      POSTGRES_PASSWORD: localdev
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

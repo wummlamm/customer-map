@@ -1,0 +1,24 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/customermap}
+    username: ${SPRING_DATASOURCE_USERNAME:customermap}
+    password: ${SPRING_DATASOURCE_PASSWORD:localdev}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+
+app:
+  cors:
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:5173}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
