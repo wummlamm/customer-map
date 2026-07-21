@@ -1,4 +1,3 @@
--- Fiktive Demo-Firmen im Rheinland
 insert into company (name, email)
 values ('Rheinwerk Solutions GmbH', 'info@rheinwerk-solutions.example'),
        ('Domstadt Digital AG', 'kontakt@domstadt-digital.example'),
