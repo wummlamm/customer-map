@@ -100,3 +100,22 @@ form button:disabled {
   color: #b3261e;
   font-size: 0.9rem;
 }
+.app-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.github-link {
+  font-size: 0.95rem;
+  color: #1f4e5f;
+  text-decoration: none;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.github-link:hover {
+  text-decoration: underline;
+}
