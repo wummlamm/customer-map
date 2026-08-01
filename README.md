@@ -6,17 +6,19 @@ thesis project ("Development of a web application with map-based data
 visualization", HHU Düsseldorf, 2023) — rebuilt from scratch with a current
 stack and deployed to Microsoft Azure.
 
-**Live demo:** _coming soon_
+**Live demo:** https://mango-pebble-018c25d1e.7.azurestaticapps.net
+**API (Swagger UI):** https://customer-map-api-tomfreund-dhgyh8c0dcdecwg9.francecentral-01.azurewebsites.net/swagger-ui.html
 
 ## Tech stack
 
 | Layer      | Technology |
 |------------|------------|
 | Backend    | Java 21, Spring Boot 3.5, Spring Data JPA, Flyway, springdoc-openapi |
-| Database   | PostgreSQL 16 (local: Docker · cloud: Azure Database for PostgreSQL) |
+| Database   | SQLite (local file, persisted on Azure App Service) |
 | Frontend   | React 18, TypeScript, Vite, react-leaflet / OpenStreetMap |
-| CI/CD      | GitHub Actions → Azure App Service + Azure Static Web Apps |
-| Testing    | JUnit 5, Mockito, ArchUnit (architecture rules), Vitest + Testing Library |
+| Hosting    | Azure App Service (backend) · Azure Static Web Apps (frontend) |
+| CI/CD      | GitHub Actions → automated build & deploy to Azure |
+| Testing    | JUnit 5, Mockito, ArchUnit (architecture rules), Vitest |
 
 ## Architecture
 
@@ -24,19 +26,24 @@ stack and deployed to Microsoft Azure.
 flowchart LR
     U[Browser] --> SWA[Azure Static Web Apps<br/>React + Leaflet]
     SWA -->|REST/JSON| API[Azure App Service<br/>Spring Boot API]
-    API --> DB[(Azure PostgreSQL<br/>Flexible Server)]
+    API --> DB[(SQLite<br/>file storage)]
 ```
+
+The frontend is built with the backend URL injected at build time
+(`VITE_API_URL`) and deployed to Azure Static Web Apps. The backend runs as a
+Spring Boot JAR on Azure App Service (Linux) and is deployed automatically from
+this repository via GitHub Actions.
 
 ## Run locally
 
 Prerequisites: Java 21 (downloaded automatically via Gradle toolchain),
-Node.js 20+, Docker.
+Node.js 20+.
 
 **1. Backend** (starts on http://localhost:8080)
 
 ```bash
 cd backend
-docker compose up -d     # PostgreSQL 16 in Docker
+mkdir -p data
 ./gradlew bootRun        # Flyway migrates the schema on first start
 ```
 
@@ -70,11 +77,9 @@ All configuration is environment-based — no credentials in the repository.
 
 | Variable | Used by | Default (local) |
 |----------|---------|-----------------|
-| `SPRING_DATASOURCE_URL` | backend | `jdbc:postgresql://localhost:5432/customermap` |
-| `SPRING_DATASOURCE_USERNAME` | backend | `customermap` |
-| `SPRING_DATASOURCE_PASSWORD` | backend | `localdev` |
+| `SPRING_DATASOURCE_URL` | backend | `jdbc:sqlite:./data/customermap.db` |
 | `APP_CORS_ALLOWED_ORIGINS` | backend | `http://localhost:5173` |
-| `VITE_API_URL` | frontend | `http://localhost:8080` |
+| `VITE_API_URL` | frontend (build time) | `http://localhost:8080` |
 
 ## Why a re-implementation?
 
@@ -82,11 +87,12 @@ The original thesis code was written during my working student position and
 belongs to my former employer. This repository is a clean rebuild: same idea,
 my own code, upgraded from Spring Boot 2.7/Java 11 to Spring Boot 3.5/Java 21,
 Create React App replaced by Vite, and extended with CI/CD and cloud
-deployment as part of my Azure certification path (AZ-900).
+deployment as part of my Azure certification path.
 
 ## Roadmap
 
-- [ ] Deploy to Azure (App Service, Static Web Apps, PostgreSQL Flexible Server)
+- [x] Deploy to Azure (App Service + Static Web Apps)
+- [ ] Restrict CORS to the deployed frontend origin
 - [ ] Upgrade to Spring Boot 4.x as a dedicated migration step
 - [ ] Infrastructure as Code (Bicep)
 - [ ] Integration tests with Testcontainers
