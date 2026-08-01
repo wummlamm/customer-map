@@ -23,14 +23,8 @@ export default function App() {
     <div className="app">
       <header className="app-header">
         <h1>customer-map</h1>
-        
-          href="https://github.com/wummlamm/customer-map"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="github-link"
-        >
-          ↗ View on GitHub
-        </a>
+        <a href="https://github.com/wummlamm/customer-map" target="_blank" rel="noopener noreferrer" className="github-link">↗ View on GitHub</a>
+      </header>
       </header>
       {error && <p className="error">Fehler beim Laden: {error}</p>}
       <div className="map-container">
