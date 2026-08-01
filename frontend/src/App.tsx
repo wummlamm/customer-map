@@ -25,7 +25,6 @@ export default function App() {
         <h1>customer-map</h1>
         <a href="https://github.com/wummlamm/customer-map" target="_blank" rel="noopener noreferrer" className="github-link">↗ View on GitHub</a>
       </header>
-      </header>
       {error && <p className="error">Fehler beim Laden: {error}</p>}
       <div className="map-container">
         <CompanyMap companies={companies} />
