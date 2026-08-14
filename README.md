@@ -34,6 +34,21 @@ The frontend is built with the backend URL injected at build time
 Spring Boot JAR on Azure App Service (Linux) and is deployed automatically from
 this repository via GitHub Actions.
 
+## CI/CD
+
+Three GitHub Actions workflows run on every push to `main`:
+
+| Workflow | Purpose |
+|----------|---------|
+| `ci.yml` | Builds and tests backend and frontend, also on pull requests |
+| `main_customer-map-api-tomfreund.yml` | Runs backend tests, builds the executable JAR and deploys it to Azure App Service |
+| `azure-static-web-apps-*.yml` | Builds the frontend and deploys it to Azure Static Web Apps, including preview environments for pull requests |
+
+In the deployment workflow the tests run before the artifact is built, and the
+deploy job depends on the build job. A failing test therefore stops the
+deployment. Merging this with `ci.yml` into one pipeline with proper stages is
+on the roadmap.
+
 ## Run locally
 
 Prerequisites: Java 21 (downloaded automatically via Gradle toolchain),
@@ -75,11 +90,11 @@ Both suites also run automatically in CI on every push (GitHub Actions).
 
 All configuration is environment-based — no credentials in the repository.
 
-| Variable | Used by | Default (local) |
-|----------|---------|-----------------|
-| `SPRING_DATASOURCE_URL` | backend | `jdbc:sqlite:./data/customermap.db` |
-| `APP_CORS_ALLOWED_ORIGINS` | backend | `http://localhost:5173` |
-| `VITE_API_URL` | frontend (build time) | `http://localhost:8080` |
+| Variable | Used by | Default (local) | Production (Azure App Settings) |
+|----------|---------|-----------------|----------------------------------|
+| `SPRING_DATASOURCE_URL` | backend | `jdbc:sqlite:./data/customermap.db` | absolute path under `/home` (persistent storage) |
+| `APP_CORS_ALLOWED_ORIGINS` | backend | `http://localhost:5173` | the deployed Static Web Apps origin |
+| `VITE_API_URL` | frontend (build time) | `http://localhost:8080` | set in the deploy workflow, baked into the bundle |
 
 ## Why a re-implementation?
 
@@ -88,11 +103,15 @@ belongs to my former employer. This repository is a clean rebuild: same idea,
 my own code, upgraded from Spring Boot 2.7/Java 11 to Spring Boot 3.5/Java 21,
 Create React App replaced by Vite, and extended with CI/CD and cloud
 deployment as part of my Azure certification path.
-
 ## Roadmap
 
 - [x] Deploy to Azure (App Service + Static Web Apps)
-- [ ] Restrict CORS to the deployed frontend origin
-- [ ] Upgrade to Spring Boot 4.x as a dedicated migration step
+- [x] Restrict CORS to the deployed frontend origin
+- [ ] Merge CI and deployment into a single pipeline with stages, so tests
+      are not built twice
+- [ ] Configure the Actuator health endpoint as the App Service health check
+- [ ] Replace publish-profile authentication with OIDC / federated credentials
+- [ ] Resolve the N+1 query in `findAll` with a fetch join or `@EntityGraph`
 - [ ] Infrastructure as Code (Bicep)
 - [ ] Integration tests with Testcontainers
+- [ ] Upgrade to Spring Boot 4.x as a dedicated migration step
