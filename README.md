@@ -18,7 +18,7 @@ stack and deployed to Microsoft Azure.
 | Frontend   | React 18, TypeScript, Vite, react-leaflet / OpenStreetMap |
 | Hosting    | Azure App Service (backend) · Azure Static Web Apps (frontend) |
 | CI/CD      | GitHub Actions → automated build & deploy to Azure |
-| Testing    | JUnit 5, Mockito, ArchUnit (architecture rules), Vitest |
+| Testing    | JUnit 5, Mockito, ArchUnit (architecture rules), Vitest, Playwright (E2E) |
 
 ## Architecture
 
@@ -48,6 +48,17 @@ In the deployment workflow the tests run before the artifact is built, and the
 deploy job depends on the build job. A failing test therefore stops the
 deployment. Merging this with `ci.yml` into one pipeline with proper stages is
 on the roadmap.
+
+## Testing strategy
+
+Tests cover four levels, each with its own tool:
+
+| Level | Tool | What it checks |
+|---|---|---|
+| Unit (backend) | JUnit 5, Mockito | Service logic in isolation |
+| Architecture | ArchUnit | Layering rules (controller → service → repository) are enforced automatically |
+| Component (frontend) | Vitest | React components in a simulated DOM |
+| End-to-end | Playwright | The real deployed app in Chromium, Firefox and WebKit |
 
 ## Run locally
 
@@ -82,9 +93,14 @@ new companies can be added via the form.
 ```bash
 cd backend && ./gradlew test        # unit tests + ArchUnit architecture rules
 cd frontend && npm test -- --run    # Vitest component tests
+
+# E2E tests against the live deployment
+cd frontend
+npx playwright install              # first run only
+BASE_URL=https://mango-pebble-018c25d1e.7.azurestaticapps.net npm run test:e2e
 ```
 
-Both suites also run automatically in CI on every push (GitHub Actions).
+Unit and component tests run automatically in CI on every push. E2E tests currently run manually against the live deployment.
 
 ## Configuration
 
@@ -103,15 +119,20 @@ belongs to my former employer. This repository is a clean rebuild: same idea,
 my own code, upgraded from Spring Boot 2.7/Java 11 to Spring Boot 3.5/Java 21,
 Create React App replaced by Vite, and extended with CI/CD and cloud
 deployment as part of my Azure certification path.
+
 ## Roadmap
 
 - [x] Deploy to Azure (App Service + Static Web Apps)
 - [x] Restrict CORS to the deployed frontend origin
-- [ ] Merge CI and deployment into a single pipeline with stages, so tests
-      are not built twice
+- [x] End-to-end tests with Playwright
+- [ ] Run Playwright E2E tests in CI after each deployment
+- [ ] Merge CI and deployment into a single pipeline with stages, so tests are not built twice
 - [ ] Configure the Actuator health endpoint as the App Service health check
 - [ ] Replace publish-profile authentication with OIDC / federated credentials
-- [ ] Resolve the N+1 query in `findAll` with a fetch join or `@EntityGraph`
-- [ ] Infrastructure as Code (Bicep)
+- [ ] Resolve the N+1 query in findAll with a fetch join or @EntityGraph
+- [ ] Infrastructure as Code (Terraform)
+- [ ] Separate local debug settings into an `application-local.yml` profile
+- [ ] Integration tests with Testcontainers
+- [ ] Upgrade to Spring Boot 4.x as a dedicated migration step
 - [ ] Integration tests with Testcontainers
 - [ ] Upgrade to Spring Boot 4.x as a dedicated migration step
