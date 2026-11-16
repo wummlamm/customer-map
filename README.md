@@ -6,8 +6,7 @@ thesis project ("Development of a web application with map-based data
 visualization", HHU Düsseldorf, 2023) — rebuilt from scratch with a current
 stack and deployed to Microsoft Azure.
 
-**Live demo:** https://mango-pebble-018c25d1e.7.azurestaticapps.net
-**API (Swagger UI):** https://customer-map-api-tomfreund-dhgyh8c0dcdecwg9.francecentral-01.azurewebsites.net/swagger-ui.html
+**Live demo:** Wurde aus Kostengründen vorerst offline genommen.
 
 ## Tech stack
 
